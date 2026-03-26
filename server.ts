@@ -7,6 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
+import bcrypt from 'bcryptjs';
 import pool from './src/db.ts';
 
 // Routes
@@ -68,6 +69,22 @@ async function migrate() {
         ('https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&q=80&w=2000', 'Saveurs Authentiques', 'Des produits frais sélectionnés avec soin.', 2, true);
       `);
     }
+
+    // Ensure at least one admin exists
+    const adminCheck = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
+    if (parseInt(adminCheck.rows[0].count) === 0) {
+      console.log('No admin found. Creating default admin user...');
+      const adminEmail = 'admin@erable-rouge.com';
+      const adminPassword = 'admin_password_2026';
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(adminPassword, salt);
+      
+      await pool.query(
+        "INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES ($1, $2, $3, $4, 'admin')",
+        [adminEmail, hashedPassword, 'Admin', 'L\'Érable Rouge']
+      );
+      console.log(`Default admin created: ${adminEmail} / ${adminPassword}`);
+    }
     
     console.log('Migration successful: All tables ensured.');
   } catch (err) {
@@ -89,8 +106,25 @@ async function startServer() {
   app.use(helmet({
     contentSecurityPolicy: false, // Disable CSP for development with Vite
   }));
+
+  const allowedOrigin = process.env.FRONTEND_URL;
   app.use(cors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin || !allowedOrigin || allowedOrigin === '*') return callback(null, true);
+      
+      const cleanAllowed = allowedOrigin.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const cleanOrigin = origin.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+      if (cleanOrigin === cleanAllowed) {
+        return callback(null, true);
+      }
+      
+      // Fallback to exact match
+      if (origin === allowedOrigin) return callback(null, true);
+      
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
   }));
   app.use(express.json());

@@ -229,8 +229,14 @@ export default function ClientLayout({ children, activePage, setActivePage, user
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-24 pt-10 border-t border-border-color text-center text-[9px] uppercase tracking-[0.3em] font-sans">
-          &copy; 2026 L'Érable Rouge Agadir. Tous droits réservés.
+        <div className="max-w-7xl mx-auto mt-24 pt-10 border-t border-border-color flex flex-col md:flex-row items-center justify-between gap-6 text-[9px] uppercase tracking-[0.3em] font-sans">
+          <div>&copy; 2026 L'Érable Rouge Agadir. Tous droits réservés.</div>
+          <button 
+            onClick={() => setActivePage('auth')}
+            className="text-secondary-text/40 hover:text-accent-red transition-colors"
+          >
+            Administration
+          </button>
         </div>
       </footer>
     </div>

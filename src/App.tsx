@@ -34,6 +34,8 @@ export default function App() {
       setClientPage('payment-success');
     } else if (path === '/paiement/echec') {
       setClientPage('payment-failure');
+    } else if (path === '/admin') {
+      setView('admin');
     }
 
     const savedUser = localStorage.getItem('user');
