@@ -33,15 +33,13 @@ export default function ClientReservation({ onNavigate, user }: ClientReservatio
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      onNavigate('auth');
-      return;
-    }
     setSubmitting(true);
     try {
       await api.reservations.create({
         ...formData,
-        number_of_guests: parseInt(formData.number_of_guests)
+        number_of_guests: parseInt(formData.number_of_guests),
+        customer_name: formData.name,
+        customer_phone: formData.phone
       });
       setSuccess(true);
     } catch (err) {
@@ -66,7 +64,7 @@ export default function ClientReservation({ onNavigate, user }: ClientReservatio
           <h1 className="text-4xl font-serif italic text-main-text">Demande envoyée !</h1>
           <p className="text-secondary-text leading-relaxed">
             Votre demande de réservation a été transmise à notre équipe. <br/>
-            Vous recevrez une confirmation par téléphone ou dans votre historique.
+            Vous recevrez une confirmation par téléphone prochainement.
           </p>
         </div>
         <button 
@@ -240,13 +238,6 @@ export default function ClientReservation({ onNavigate, user }: ClientReservatio
                 </span>
               )}
             </button>
-            
-            {!user && (
-              <p className="text-center text-[10px] text-secondary-text font-serif italic">
-                Veuillez vous connecter pour réserver votre table. <br/>
-                <button type="button" onClick={() => onNavigate('auth')} className="text-accent-red font-sans font-bold uppercase tracking-widest mt-2 hover:opacity-70 transition-opacity">Se connecter</button>
-              </p>
-            )}
           </form>
         </div>
       </div>

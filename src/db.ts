@@ -1,14 +1,15 @@
 import pg from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL;
+let connectionString = process.env.DATABASE_URL;
+
+if (connectionString === 'undefined') {
+  connectionString = undefined;
+}
 
 if (!connectionString) {
-  console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing.');
+  console.error('CRITICAL ERROR: DATABASE_URL environment variable is missing or "undefined".');
   console.error('Please set DATABASE_URL in the Settings menu (e.g., postgresql://user:pass@host/dbname?sslmode=require)');
 }
 

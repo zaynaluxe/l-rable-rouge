@@ -57,7 +57,17 @@ async function migrate() {
       
       -- Update existing confirmed reservations to en_attente as requested
       UPDATE reservations SET status = 'en_attente' WHERE status = 'confirmé' OR status = 'en attente';
+
+      -- Add customer fields for anonymous orders/reservations
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255);
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255);
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);
     `);
+
+    // Clean up users: Keep only admin
+    console.log('Cleaning up users table...');
+    await pool.query("DELETE FROM users WHERE role != 'admin'");
 
     // Insert default slides if none exist
     const slidesCheck = await pool.query('SELECT COUNT(*) FROM slides');

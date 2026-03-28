@@ -29,14 +29,16 @@ export default function ClientMenu() {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching menu from:', api.menu.getAll);
       const [itemsData, catsData] = await Promise.all([
         api.menu.getAll(),
         api.menu.getCategories()
       ]);
-      setItems(itemsData.filter(i => i.is_available));
-      setCategories(catsData);
+      console.log('Items received:', itemsData);
+      setItems(Array.isArray(itemsData) ? itemsData.filter(i => i.is_available) : []);
+      setCategories(Array.isArray(catsData) ? catsData : []);
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching menu:', err);
     } finally {
       setLoading(false);
     }

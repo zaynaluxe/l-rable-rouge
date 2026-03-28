@@ -27,6 +27,29 @@ export default function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [view, setView] = useState<'client' | 'admin'>('client');
   const [clientPage, setClientPage] = useState('home');
+  const [secretBuffer, setSecretBuffer] = useState('');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only track alphanumeric keys
+      if (!/^[a-zA-Z0-9]$/.test(e.key)) return;
+      
+      const newBuffer = (secretBuffer + e.key.toLowerCase()).slice(-5);
+      setSecretBuffer(newBuffer);
+      
+      if (newBuffer === 'admin') {
+        if (!user || user.role !== 'admin') {
+          setShowAdminLogin(true);
+        } else {
+          setView('admin');
+        }
+        setSecretBuffer('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [secretBuffer, user]);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -40,13 +63,19 @@ export default function App() {
 
     const savedUser = localStorage.getItem('user');
     const savedToken = localStorage.getItem('token');
-    if (savedUser && savedToken) {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
-      setToken(savedToken);
-      // If user is admin, default to admin view
-      if (parsedUser.role === 'admin') {
-        setView('admin');
+    if (savedUser && savedUser !== 'undefined' && savedToken && savedToken !== 'undefined') {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        setToken(savedToken);
+        // If user is admin, default to admin view
+        if (parsedUser.role === 'admin') {
+          setView('admin');
+        }
+      } catch (e) {
+        console.error('[App] Failed to parse saved user:', e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
     }
     setIsAuthReady(true);
@@ -57,6 +86,7 @@ export default function App() {
     localStorage.setItem('user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+    setShowAdminLogin(false);
     if (newUser.role === 'admin') {
       setView('admin');
     } else {
@@ -118,13 +148,6 @@ export default function App() {
       case 'menu': return <ClientMenu />;
       case 'cart': return <ClientCart onNavigate={setClientPage} user={user} />;
       case 'reservation': return <ClientReservation onNavigate={setClientPage} user={user} />;
-      case 'auth': return <ClientAuth onLogin={handleLogin} onNavigate={setClientPage} />;
-      case 'history': 
-        if (!user) {
-          setClientPage('auth');
-          return <ClientAuth onLogin={handleLogin} onNavigate={setClientPage} />;
-        }
-        return <ClientHistory onNavigate={setClientPage} />;
       case 'payment-success': return <PaymentSuccess />;
       case 'payment-failure': return <PaymentFailure />;
       default: return <ClientHome onNavigate={setClientPage} />;
@@ -142,6 +165,20 @@ export default function App() {
       >
         {renderClientContent()}
       </ClientLayout>
+
+      {showAdminLogin && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-md">
+            <button 
+              onClick={() => setShowAdminLogin(false)}
+              className="absolute -top-12 right-0 text-white/60 hover:text-white text-sm uppercase tracking-widest font-sans font-bold"
+            >
+              Fermer [ESC]
+            </button>
+            <AdminLogin onLogin={handleLogin} />
+          </div>
+        </div>
+      )}
     </CartProvider>
   );
 }

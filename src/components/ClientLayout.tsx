@@ -30,7 +30,6 @@ export default function ClientLayout({ children, activePage, setActivePage, user
     { id: 'home', label: 'Accueil', icon: <Home className="w-5 h-5" /> },
     { id: 'menu', label: 'La Carte', icon: <UtensilsCrossed className="w-5 h-5" /> },
     { id: 'reservation', label: 'Réserver', icon: <Calendar className="w-5 h-5" /> },
-    { id: 'history', label: 'Mes Commandes', icon: <ShoppingBag className="w-5 h-5" /> },
   ];
 
   return (
@@ -82,21 +81,13 @@ export default function ClientLayout({ children, activePage, setActivePage, user
               )}
             </button>
             
-            {user ? (
+            {user && (
               <div className="hidden md:flex items-center gap-4 pl-6 border-l border-border-color">
                 <span className="text-[11px] uppercase tracking-widest font-sans font-medium text-main-text">{user.first_name || user.email.split('@')[0]}</span>
                 <button onClick={onLogout} className="text-secondary-text hover:text-accent-red transition-colors">
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
-            ) : (
-              <button 
-                onClick={() => setActivePage('auth')}
-                className="hidden md:flex items-center gap-2 text-[11px] uppercase tracking-widest font-sans font-bold text-accent-red hover:text-main-text transition-all duration-300"
-              >
-                <User className="w-4 h-4" />
-                Connexion
-              </button>
             )}
           </div>
         </div>
@@ -144,21 +135,13 @@ export default function ClientLayout({ children, activePage, setActivePage, user
                 ))}
                 
                 <div className="pt-8 border-t border-border-color">
-                  {user ? (
+                  {user && (
                     <button 
                       onClick={() => { onLogout(); setIsMenuOpen(false); }}
                       className="w-full flex items-center gap-5 text-sm uppercase tracking-[0.2em] font-sans font-medium text-accent-red"
                     >
                       <LogOut className="w-4 h-4" />
                       Déconnexion
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => { setActivePage('auth'); setIsMenuOpen(false); }}
-                      className="w-full flex items-center gap-5 text-sm uppercase tracking-[0.2em] font-sans font-medium text-accent-red"
-                    >
-                      <User className="w-4 h-4" />
-                      Se connecter
                     </button>
                   )}
                 </div>
@@ -231,12 +214,6 @@ export default function ClientLayout({ children, activePage, setActivePage, user
         </div>
         <div className="max-w-7xl mx-auto mt-24 pt-10 border-t border-border-color flex flex-col md:flex-row items-center justify-between gap-6 text-[9px] uppercase tracking-[0.3em] font-sans">
           <div>&copy; 2026 L'Érable Rouge Agadir. Tous droits réservés.</div>
-          <button 
-            onClick={() => setActivePage('auth')}
-            className="text-secondary-text/40 hover:text-accent-red transition-colors"
-          >
-            Administration
-          </button>
         </div>
       </footer>
     </div>

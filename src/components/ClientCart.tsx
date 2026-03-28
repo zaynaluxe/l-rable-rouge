@@ -63,6 +63,7 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'carte'>('cash');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
+  const [customer_name, setCustomerName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
@@ -90,10 +91,6 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      onNavigate('auth');
-      return;
-    }
     if (items.length === 0) return;
 
     setSubmitting(true);
@@ -104,6 +101,8 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
         total_amount: finalTotal,
         items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity, price: i.price })),
         delivery_address: orderType === 'livraison' ? address : null,
+        customer_name: customer_name,
+        customer_phone: phone
       };
       const order = await api.orders.create(orderData);
       
@@ -171,14 +170,8 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
           <button 
-            onClick={() => onNavigate('history')}
-            className="bg-primary-red text-white font-bold py-4 px-8 rounded-2xl hover:bg-secondary-red transition-all shadow-lg shadow-primary-red/20"
-          >
-            Suivre ma commande
-          </button>
-          <button 
             onClick={() => onNavigate('home')}
-            className="bg-white/5 text-secondary-text font-bold py-4 px-8 rounded-2xl hover:bg-white/10 transition-all border border-border-color"
+            className="bg-primary-red text-white font-bold py-4 px-8 rounded-2xl hover:bg-secondary-red transition-all shadow-lg shadow-primary-red/20"
           >
             Retour à l'accueil
           </button>
@@ -302,6 +295,34 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-10">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-sans font-bold text-secondary-text uppercase tracking-[0.2em]">Votre Nom</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Votre nom complet"
+                    value={customer_name}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="elegant-input w-full px-6 py-5 text-xs"
+                  />
+                </div>
+                
+                {orderType !== 'livraison' && (
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-sans font-bold text-secondary-text uppercase tracking-[0.2em]">Téléphone</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="06 XX XX XX XX"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="elegant-input w-full px-6 py-5 text-xs"
+                    />
+                  </div>
+                )}
+              </div>
+
               {orderType === 'livraison' && (
                 <div className="space-y-10">
                   <div className="space-y-4">
@@ -425,13 +446,6 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
                   </span>
                 )}
               </button>
-              
-              {!user && (
-                <p className="text-center text-[10px] text-secondary-text font-serif italic">
-                  Veuillez vous connecter pour finaliser votre commande. <br/>
-                  <button type="button" onClick={() => onNavigate('auth')} className="text-accent-red font-sans font-bold uppercase tracking-widest mt-2 hover:opacity-70 transition-opacity">Se connecter</button>
-                </p>
-              )}
             </form>
           </div>
         </div>
