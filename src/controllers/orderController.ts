@@ -39,8 +39,8 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     }
 
     // 3. Update Order Total
-    const livraison_frais = order_type === 'livraison' ? 15 : 0;
-    const finalTotal = totalAmount + livraison_frais;
+    const livraison_frais = 0;
+    const finalTotal = totalAmount;
 
     await client.query(
       'UPDATE orders SET total_amount = $1, livraison_frais = $2 WHERE id = $3',

@@ -98,11 +98,11 @@ export default function OrderManagement() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-white font-medium">
                         <User className="w-4 h-4 text-primary-red" />
-                        {order.first_name} {order.last_name}
+                        {order.customer_name || `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Client Anonyme'}
                       </div>
                       <div className="flex items-center gap-2 text-gray-text text-sm">
                         <Phone className="w-4 h-4 text-primary-red" />
-                        {order.phone}
+                        {order.customer_phone || order.phone || 'Non renseigné'}
                       </div>
                     </div>
                     
@@ -210,17 +210,7 @@ export default function OrderManagement() {
                           </div>
                         ))}
                         <div className="space-y-1 pt-2 border-t border-border-dark">
-                          <div className="flex items-center justify-between text-gray-text text-sm">
-                            <span>SOUS-TOTAL</span>
-                            <span>{Number(order.total_amount - (order.livraison_frais || 0)).toFixed(0)} MAD</span>
-                          </div>
-                          {order.order_type === 'livraison' && (
-                            <div className="flex items-center justify-between text-gray-text text-sm">
-                              <span>LIVRAISON</span>
-                              <span>{Number(order.livraison_frais || 0).toFixed(0)} MAD</span>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between text-primary-red font-bold text-lg pt-2">
+                          <div className="flex items-center justify-between text-main-text font-bold text-lg pt-2">
                             <span>TOTAL TTC</span>
                             <span>{Number(order.total_amount).toFixed(0)} MAD</span>
                           </div>
@@ -238,13 +228,13 @@ export default function OrderManagement() {
                         <div className="flex items-center gap-3 text-stone-300">
                           <User className="w-5 h-5 text-primary-red" />
                           <div className="flex flex-col">
-                            <span className="font-bold">{order.first_name} {order.last_name}</span>
-                            <span className="text-gray-text text-sm">{order.email}</span>
+                            <span className="font-bold">{order.customer_name || `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Client Anonyme'}</span>
+                            <span className="text-gray-text text-sm">{order.email || 'Pas d\'email'}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 text-stone-300">
                           <Phone className="w-5 h-5 text-primary-red" />
-                          <span>{order.phone}</span>
+                          <span>{order.customer_phone || order.phone || 'Non renseigné'}</span>
                         </div>
                         {order.order_type === 'livraison' && (
                           <div className="flex items-start gap-3 text-stone-300">

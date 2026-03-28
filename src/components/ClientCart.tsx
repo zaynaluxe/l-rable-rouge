@@ -78,7 +78,7 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
     }
   }, [user]);
 
-  const finalTotal = total + (orderType === 'livraison' ? 15 : 0);
+  const finalTotal = total;
 
   const handleLocationSelect = async (lat: number, lng: number) => {
     setMapPosition([lat, lng]);
@@ -429,13 +429,9 @@ export default function ClientCart({ onNavigate, user }: ClientCartProps) {
                   <span>Sous-total</span>
                   <span>{total.toFixed(0)} MAD</span>
                 </div>
-                <div className="flex items-center justify-between text-secondary-text font-serif italic">
-                  <span>Service de livraison</span>
-                  <span>{orderType === 'livraison' ? '15 MAD' : '0 MAD'}</span>
-                </div>
                 <div className="flex items-center justify-between text-main-text pt-4">
                   <span className="text-xl font-display italic">Total</span>
-                  <span className="text-2xl font-sans font-bold text-accent-red tracking-widest">{(total + (orderType === 'livraison' ? 15 : 0)).toFixed(0)} MAD</span>
+                  <span className="text-2xl font-sans font-bold text-accent-red tracking-widest">{total.toFixed(0)} MAD</span>
                 </div>
               </div>
 
