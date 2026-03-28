@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -18,8 +20,6 @@ import reservationRoutes from './src/routes/reservationRoutes.ts';
 import deliveryRoutes from './src/routes/deliveryRoutes.ts';
 import paymentRoutes from './src/routes/paymentRoutes.ts';
 import slideRoutes from './src/routes/slideRoutes.ts';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,7 +94,7 @@ async function migrate() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Run migrations
   await migrate();
@@ -107,23 +107,30 @@ async function startServer() {
     contentSecurityPolicy: false, // Disable CSP for development with Vite
   }));
 
-  const allowedOrigin = process.env.FRONTEND_URL;
+  // Simple and reliable CORS configuration
+  const allowedOrigins = [
+    'https://lerablerouge.com',
+    'https://www.lerablerouge.com',
+    'https://l-rable-rouge.vercel.app'
+  ];
+
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || !allowedOrigin || allowedOrigin === '*') return callback(null, true);
+      if (!origin) return callback(null, true);
       
-      const cleanAllowed = allowedOrigin.replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const cleanOrigin = origin.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        origin.endsWith('.vercel.app') || 
+                        origin.endsWith('.run.app') || 
+                        origin.includes('localhost') || 
+                        origin.includes('127.0.0.1');
 
-      if (cleanOrigin === cleanAllowed) {
-        return callback(null, true);
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS] Blocage de l'origine : ${origin}`);
+        callback(new Error('Not allowed by CORS'));
       }
-      
-      // Fallback to exact match
-      if (origin === allowedOrigin) return callback(null, true);
-      
-      callback(new Error('Not allowed by CORS'));
     },
     credentials: true
   }));
