@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import ScrollToTop from "./components/ScrollToTop";
 import AdminLogin from "./components/AdminLogin";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./components/AdminDashboard";
