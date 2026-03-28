@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import pool from '../db.ts';
 import { AuthRequest } from '../middleware/auth.ts';
+import { sendTelegramMessage } from '../services/telegramService.ts';
 
 export const createOrder = async (req: AuthRequest, res: Response) => {
-  const { items, order_type, delivery_address } = req.body;
+  const { items, order_type, delivery_address, customer_name, customer_phone } = req.body;
   const user_id = req.user?.id;
 
   const client = await pool.connect();
@@ -11,22 +12,25 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     await client.query('BEGIN');
 
     // 1. Create Order
-    console.log(`[DEBUG] Creating order for user_id: ${user_id}`);
+    console.log(`[DEBUG] Creating order. user_id: ${user_id}, customer_name: ${customer_name}`);
     const orderResult = await client.query(
-      'INSERT INTO orders (user_id, order_type, status) VALUES ($1, $2, $3) RETURNING id',
-      [user_id, order_type, 'en attente']
+      'INSERT INTO orders (user_id, order_type, status, customer_name, customer_phone) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [user_id, order_type, 'en attente', customer_name, customer_phone]
     );
     const orderId = orderResult.rows[0].id;
 
     let totalAmount = 0;
+    let itemsDetails = '';
 
     // 2. Create Order Items
     for (const item of items) {
       const { menu_item_id, quantity } = item;
-      const menuResult = await client.query('SELECT price FROM menu_items WHERE id = $1', [menu_item_id]);
-      const unitPrice = menuResult.rows[0].price;
+      const menuResult = await client.query('SELECT name, price FROM menu_items WHERE id = $1', [menu_item_id]);
+      const { name, price: unitPrice } = menuResult.rows[0];
       const subtotal = unitPrice * quantity;
       totalAmount += subtotal;
+
+      itemsDetails += `- ${name} x${quantity} (${subtotal} DH)\n`;
 
       await client.query(
         'INSERT INTO order_items (order_id, menu_item_id, quantity, unit_price) VALUES ($1, $2, $3, $4)',
@@ -52,9 +56,26 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     }
 
     await client.query('COMMIT');
+
+    // 5. Send Telegram Notification
+    const telegramMessage = `
+<b>🔔 Nouvelle Commande !</b>
+<b>ID:</b> #${orderId}
+<b>Client:</b> ${customer_name || 'Anonyme'}
+<b>Téléphone:</b> ${customer_phone || 'Non renseigné'}
+<b>Type:</b> ${order_type === 'livraison' ? '🚚 Livraison' : '🥡 À emporter'}
+${order_type === 'livraison' ? `<b>Adresse:</b> ${delivery_address}\n` : ''}
+<b>Articles:</b>
+${itemsDetails}
+<b>Total:</b> ${finalTotal} DH
+    `;
+    
+    sendTelegramMessage(telegramMessage);
+
     res.status(201).json({ id: orderId, total_amount: totalAmount });
   } catch (error) {
     await client.query('ROLLBACK');
+    console.error('Error creating order:', error);
     res.status(500).json({ error: 'Erreur lors de la création de la commande.' });
   } finally {
     client.release();
