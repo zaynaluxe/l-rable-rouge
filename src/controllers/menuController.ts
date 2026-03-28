@@ -5,7 +5,7 @@ import pool from '../db.ts';
 export const getCategories = async (req: Request, res: Response) => {
   try {
     const result = await pool.query('SELECT * FROM categories ORDER BY display_order ASC');
-    res.json(result.rows);
+    res.json(result?.rows || []);
   } catch (error: any) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ 
@@ -37,8 +37,9 @@ export const getMenuItems = async (req: Request, res: Response) => {
       LEFT JOIN categories c ON m.category_id = c.id 
       ORDER BY c.display_order, m.name
     `);
-    res.json(result.rows);
+    res.json(result?.rows || []);
   } catch (error) {
+    console.error('Error fetching menu items:', error);
     res.status(500).json({ error: 'Erreur lors de la récupération du menu.' });
   }
 };
