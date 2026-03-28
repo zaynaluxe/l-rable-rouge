@@ -1,6 +1,19 @@
 import { Category, MenuItem, Order, Reservation, Delivery, Slide } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const getBaseApiUrl = () => {
+  // Support both Vite and Next.js naming conventions for environment variables
+  let url = (import.meta as any).env.VITE_API_URL || (import.meta as any).env.NEXT_PUBLIC_API_URL || '/api';
+  
+  // If it's a full URL and doesn't end with /api, append it
+  if (url.startsWith('http') && !url.endsWith('/api')) {
+    url = url.endsWith('/') ? `${url}api` : `${url}/api`;
+  }
+  
+  console.log('[API] Using base URL:', url);
+  return url;
+};
+
+const API_URL = getBaseApiUrl();
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../db.ts';
 import { AuthRequest } from '../middleware/auth.ts';
+import { sendTelegramMessage } from '../services/telegramService.ts';
 
 export const createReservation = async (req: AuthRequest, res: Response) => {
   const { reservation_date, reservation_time, number_of_guests, special_requests } = req.body;
@@ -11,8 +12,27 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
       'INSERT INTO reservations (user_id, reservation_date, reservation_time, number_of_guests, special_requests, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [user_id, reservation_date, reservation_time, number_of_guests, special_requests, 'en_attente']
     );
-    res.status(201).json(result.rows[0]);
+    const reservation = result.rows[0];
+
+    // Send Telegram Notification
+    const userResult = await pool.query('SELECT first_name, last_name, phone FROM users WHERE id = $1', [user_id]);
+    const user = userResult.rows[0];
+
+    const telegramMessage = `
+<b>📅 Nouvelle Réservation !</b>
+<b>Client:</b> ${user.first_name} ${user.last_name}
+<b>Téléphone:</b> ${user.phone || 'Non renseigné'}
+<b>Date:</b> ${reservation_date}
+<b>Heure:</b> ${reservation_time}
+<b>Personnes:</b> ${number_of_guests}
+<b>Demandes:</b> ${special_requests || 'Aucune'}
+    `;
+
+    sendTelegramMessage(telegramMessage);
+
+    res.status(201).json(reservation);
   } catch (error) {
+    console.error('Error creating reservation:', error);
     res.status(500).json({ error: 'Erreur lors de la réservation.' });
   }
 };
