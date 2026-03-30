@@ -118,10 +118,12 @@ async function startServer() {
   }));
 
   // Simple and reliable CORS configuration
+  const envFrontendUrls = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(u => u.trim()) : [];
   const allowedOrigins = [
     'https://lerablerouge.com',
     'https://www.lerablerouge.com',
-    'https://l-rable-rouge.vercel.app'
+    'https://l-rable-rouge.vercel.app',
+    ...envFrontendUrls
   ];
 
   app.use(cors({
