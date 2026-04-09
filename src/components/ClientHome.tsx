@@ -40,7 +40,7 @@ export default function ClientHome({ onNavigate }: ClientHomeProps) {
         <div className="absolute inset-0">
           <img 
             src="https://res.cloudinary.com/dmgsz5ihe/image/upload/q_auto/f_auto/v1775736611/WhatsApp_Image_2026-04-07_at_20.31.43_nrwy5t.jpg" 
-            alt="L'Érable Rouge - Accueil" 
+            alt="L'Érable Rouge Interior" 
             className="w-full h-full object-cover opacity-100"
             referrerPolicy="no-referrer"
           />
@@ -140,8 +140,8 @@ export default function ClientHome({ onNavigate }: ClientHomeProps) {
           <div className="relative order-2 lg:order-1">
             <div className="aspect-[4/5] overflow-hidden border border-border-color p-4 bg-white">
               <img 
-                src="https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&q=80&w=1000" 
-                alt="Signature dish" 
+                src="https://res.cloudinary.com/dmgsz5ihe/image/upload/q_auto/f_auto/v1775739165/IMG_8145_copie_vcutf5.webp" 
+                alt="Notre Philosophie" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
@@ -216,6 +216,84 @@ export default function ClientHome({ onNavigate }: ClientHomeProps) {
               </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* Additional Story Sections */}
+      <section className="space-y-32 py-32">
+        {/* Section 1 */}
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="order-2 lg:order-1 space-y-8">
+              <span className="text-accent-red font-sans font-medium uppercase tracking-[0.3em] text-[10px]">L'Art de la Table</span>
+              <h2 className="text-4xl md:text-5xl font-display italic text-main-text leading-tight">
+                Une atmosphère <br/> élégante et chaleureuse
+              </h2>
+              <p className="text-secondary-text leading-relaxed text-lg font-serif italic">
+                À L'Érable Rouge, chaque détail compte. Notre décoration allie élégance moderne et touches traditionnelles pour créer une atmosphère chaleureuse et raffinée, idéale pour vos moments d'exception.
+              </p>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="aspect-[16/10] overflow-hidden border border-border-color p-4 bg-white">
+                <img 
+                  src="https://res.cloudinary.com/dmgsz5ihe/image/upload/q_auto/f_auto/v1775739162/IMG_8130_copie_lsweam.webp" 
+                  alt="L'Art de la Table" 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2 */}
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="order-1">
+              <div className="aspect-[16/10] overflow-hidden border border-border-color p-4 bg-white">
+                <img 
+                  src="https://res.cloudinary.com/dmgsz5ihe/image/upload/q_auto/f_auto/v1775739145/IMG_8131-Avec_accentuation-NR_copie_llapdx.webp" 
+                  alt="Une Expérience Unique" 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            </div>
+            <div className="order-2 space-y-8">
+              <span className="text-accent-red font-sans font-medium uppercase tracking-[0.3em] text-[10px]">Une Expérience Unique</span>
+              <h2 className="text-4xl md:text-5xl font-display italic text-main-text leading-tight">
+                Un voyage culinaire <br/> au cœur d'Agadir
+              </h2>
+              <p className="text-secondary-text leading-relaxed text-lg font-serif italic">
+                Découvrez une cuisine qui raconte une histoire. Nos plats sont conçus pour éveiller vos sens et vous transporter dans un voyage culinaire inoubliable, où les saveurs du Maroc sont sublimées.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3 */}
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="order-2 lg:order-1 space-y-8">
+              <span className="text-accent-red font-sans font-medium uppercase tracking-[0.3em] text-[10px]">Savoir-Faire & Tradition</span>
+              <h2 className="text-4xl md:text-5xl font-display italic text-main-text leading-tight">
+                L'excellence dans <br/> chaque assiette
+              </h2>
+              <p className="text-secondary-text leading-relaxed text-lg font-serif italic">
+                Notre engagement envers la qualité se reflète dans chaque assiette. Nous honorons les recettes ancestrales tout en y apportant une touche de créativité contemporaine pour ravir les palais les plus exigeants.
+              </p>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="aspect-[16/10] overflow-hidden border border-border-color p-4 bg-white">
+                <img 
+                  src="https://res.cloudinary.com/dmgsz5ihe/image/upload/q_auto/f_auto/v1775739165/IMG_8145_copie_vcutf5.webp" 
+                  alt="Savoir-Faire & Tradition" 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
